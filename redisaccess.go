@@ -14,13 +14,14 @@ import (
 var redisClient *redis.Client
 
 func isInitialized() (err error) {
+
 	if redisClient == nil {
 		err = errors.New("Redis not initialized, call InitRedis first")
 	}
 	return
 }
 
-func InitRedis(servername, password string) (client *redis.Client) {
+func InitRedis(servername, password string) (client *redis.Client, err error) {
 
 	if !strings.Contains(servername, ":") {
 		servername += ":6379"
@@ -31,11 +32,20 @@ func InitRedis(servername, password string) (client *redis.Client) {
 		DB:       0, // use default DB
 	})
 	client = redisClient
+	cmd := client.Ping()
+	err = cmd.Err()
 	return
 
 }
 
+func InitRedisLocalhost() (client *redis.Client, err error) {
+
+	client, err = InitRedis("localhost", "")
+	return
+}
+
 func SetValue(key string, value interface{}, duration time.Duration) (err error) {
+
 	err = isInitialized()
 	if err == nil {
 		data, err := json.Marshal(value)
@@ -51,6 +61,7 @@ func SetValue(key string, value interface{}, duration time.Duration) (err error)
 }
 
 func GetValue(key string) (value string, found bool, err error) {
+
 	err = isInitialized()
 	if err == nil {
 		result := redisClient.Get(key)
@@ -66,6 +77,7 @@ func GetValue(key string) (value string, found bool, err error) {
 }
 
 func RemoveValue(key string) (err error) {
+
 	err = isInitialized()
 	if err == nil {
 		status := redisClient.Del(key)
@@ -76,6 +88,7 @@ func RemoveValue(key string) (err error) {
 }
 
 func AddToQueue(queuename string, key string, value interface{}) (success bool, err error) {
+
 	err = isInitialized()
 	if err == nil {
 		data, err := json.Marshal(value)
@@ -91,6 +104,7 @@ func AddToQueue(queuename string, key string, value interface{}) (success bool, 
 }
 
 func ReadQueue(queuename string) (queue []string, err error) {
+
 	err = isInitialized()
 	if err == nil {
 		queue, err = redisClient.HKeys(queuename).Result()
@@ -100,6 +114,7 @@ func ReadQueue(queuename string) (queue []string, err error) {
 }
 
 func RemoveFromQueue(queuename, key string) (err error) {
+
 	err = isInitialized()
 	if err == nil {
 		cmd := redisClient.HDel(queuename, key)
@@ -109,6 +124,7 @@ func RemoveFromQueue(queuename, key string) (err error) {
 }
 
 func ScanQueue(queuename string, limit int) (queue []string, err error) {
+
 	err = isInitialized()
 	if err == nil {
 		queue, _, err = redisClient.HScan(queuename, 0, "", int64(limit)).Result()
