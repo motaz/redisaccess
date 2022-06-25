@@ -1,4 +1,4 @@
-module redisaccess
+module github.com/motaz/redisaccess
 
 go 1.17
 
