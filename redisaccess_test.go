@@ -8,7 +8,7 @@ import (
 
 func Test(t *testing.T) {
 	InitRedis("localhost", "")
-	err := SetValue("sec-key", "My Data", time.Second*120)
+	err := SetValue("sec-key", "My Data-2", time.Second*120)
 	fmt.Printf("%v\n", err)
 	val, found, err := GetValue("sec-key")
 	fmt.Printf("%v %v %v\n", val, found, err)
