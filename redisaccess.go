@@ -44,6 +44,22 @@ func InitRedisLocalhost() (client *redis.Client, err error) {
 	return
 }
 
+func GetKeys(keys string) (list []string, err error) {
+
+	err = isInitialized()
+	if err == nil {
+		result := redisClient.Keys(keys)
+
+		err = result.Err()
+
+		if err == nil {
+
+			list = result.Val()
+		}
+	}
+	return
+}
+
 func SetValue(key string, value interface{}, duration time.Duration) (err error) {
 
 	err = isInitialized()
