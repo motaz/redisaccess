@@ -178,3 +178,17 @@ func GetBytes(key string) (value []byte, found bool, err error) {
 	}
 	return
 }
+
+func GetRedisClient() (aRedisClient *redis.Client) {
+
+	aRedisClient = redisClient
+	return
+}
+
+func GetTTL(key string) (duration time.Duration, err error) {
+
+	dur := redisClient.TTL(key)
+	duration, err = dur.Result()
+
+	return
+}
