@@ -148,3 +148,33 @@ func ScanQueue(queuename string, limit int) (queue []string, err error) {
 
 	return
 }
+
+func SetBytes(key string, value []byte, duration time.Duration) (err error) {
+
+	err = isInitialized()
+	if err == nil {
+
+		status := redisClient.Set(key, value, duration)
+
+		err = status.Err()
+
+	}
+
+	return
+}
+
+func GetBytes(key string) (value []byte, found bool, err error) {
+
+	err = isInitialized()
+	if err == nil {
+		result := redisClient.Get(key)
+
+		err = result.Err()
+		found = err == nil
+		if found {
+
+			value, err = result.Bytes()
+		}
+	}
+	return
+}
