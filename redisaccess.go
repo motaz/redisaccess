@@ -4,6 +4,7 @@ package redisaccess
 import (
 	"encoding/json"
 	"errors"
+
 	"strings"
 
 	"time"
@@ -87,6 +88,25 @@ func GetValue(key string) (value string, found bool, err error) {
 		if found {
 
 			value = result.Val()
+		}
+	}
+	return
+}
+
+func ReadValue(key string, value interface{}) (found bool, err error) {
+
+	err = isInitialized()
+	if err == nil {
+		result := redisClient.Get(key)
+
+		err = result.Err()
+		found = err == nil
+		if found {
+			var data []byte
+			data, err = result.Bytes()
+			if err == nil {
+				err = json.Unmarshal(data, &value)
+			}
 		}
 	}
 	return
